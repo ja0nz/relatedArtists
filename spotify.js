@@ -1,12 +1,12 @@
-"https://api.spotify.com/v1/search?q=${query}&type=artist" // artists: {item: []}
-"https://api.spotify.com/v1/artists/${id}/related-artists" // artists: []
+// `https://api.spotify.com/v1/search?q=${query}&type=artist` // artists: {item: []}
+// `https://api.spotify.com/v1/artists/${id}/related-artists` // artists: []
 
 const Task = require('data.task');
 const Either = require('data.either');
 const request = require('request');
 const oauth = require('./token');
 
-const httpGet = (url) =>
+const httpGet = (url) => // :: String -> Task Response
     new Task((rej, res) =>
         request.get(url, {
             'auth': {
@@ -15,23 +15,26 @@ const httpGet = (url) =>
         }, (error, response, body) => error ? rej(err) : res(body))
     );
 
-const first = xs =>
-    Either.fromNullable(xs[0]);
+const first = xs => // :: Array -> Either
+    Either.fromNullable(xs[0]); // null checking, code branch to Left or Right
 
-const eitherToTask = either => either.fold(Task.rejected, Task.of);
-const parse = Either.try(JSON.parse);
-const getJSON = (url) =>
-    httpGet(url)
-    .map(parse) // Either Task Artist
-    .chain(eitherToTask); // Task Artist
+const eitherToTask = either => // :: Either -> InnerType
+      either.fold(Task.rejected, Task.of); // Reject or Accept
 
-const findArtist = name =>
+const parse = Either.try(JSON.parse); // :: Either JSON
+
+const getJSON = url => // :: String -> Task JSON
+    httpGet(url) // Task Response
+    .map(parse) //  Task Either JSON
+    .chain(eitherToTask); // Task JSON or rejected
+
+const findArtist = name => // :: String -> Task Items
     getJSON(`https://api.spotify.com/v1/search?q=${name}&type=artist`)
     .map(res => res.artists.items) // Task Items
     .map(first) // Task Either Items
-    .chain(eitherToTask); // Fold either to Task Items
+    .chain(eitherToTask); // Task Items or rejected
 
-const relatedArtists = id =>
+const relatedArtists = id => // :: String -> Task [Artists]
     getJSON(`https://api.spotify.com/v1/artists/${id}/related-artists`)
     .map(res => res.artists); // Task Artist
 // .map(first) // Task Either Artist
