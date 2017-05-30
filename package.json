@@ -1,0 +1,11 @@
+{
+  "name": "relatedArtists",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "data.either": "^1.5.1",
+    "data.task": "^3.1.1",
+    "fantasy-identities": "^0.0.1"
+  }
+}
