@@ -22,17 +22,16 @@ const related = name => // :: String -> Task [Artistsnames]
       .chain(Spotify.relatedArtists) // :: ID -> Task [Artists]
       .map(artists => artists.map(artist => artist.name)); // Cut out artistnames  
 
-/*
-  Extended example
+ // Extended example
 
   const artistIntersection = rels =>
   rels.foldMap(x => Pair(Intersection(x), Sum(x.length))) // Making a pair
-  .bimap(x => x.xs, y => y.x) // run two functors
-  .toList() // Natural transformation
-*/
+  .bimap(x => x.entries, y => y.x) // run two functors
+  .toList(); // Natural transformation
 
-const artistIntersection = rels => // :: Task [Task artist1, Task Artist2] -> [names] 
-      rels.foldMap(Intersection).entries; // no empty list assumed
+
+// const artistIntersection = rels => // :: Task [Task artist1, Task Artist2] -> [names] 
+//       rels.foldMap(Intersection).entries; // no empty list assumed
 
 
 const main = (names) => // :: String -> [names]
